@@ -6,7 +6,8 @@ RUN apk add --no-cache \
     gcc \
     musl-dev \
     libffi-dev \
-    libpq-dev
+    libpq-dev \
+    build-base
 
 # Definir o diretório de trabalho
 WORKDIR /app
@@ -25,7 +26,6 @@ FROM python:3.12-alpine3.19
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copiar apenas as dependências instaladas da etapa de build
-COPY --from=build /root/.cache /root/.cache
 COPY --from=build /usr/local /usr/local
 
 # Definir o diretório de trabalho e usuário
@@ -35,3 +35,5 @@ USER appuser
 # Copiar a aplicação
 COPY . .
 
+# Entrypoint ou comando (se necessário)
+# CMD ["python", "app.py"]
