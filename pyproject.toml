@@ -1,0 +1,31 @@
+[project]
+name = "api-startkit"
+version = "0.1.0"
+description = "A FastAPI template for building scalable and high-performance APIs."
+authors = [
+    {name = "KauanldsBarbosa",email = "kauanldsbarbosa@gmail.com"}
+]
+license = {text = "CC BY-NC 4.0"}
+readme = "README.md"
+packages = [{include = "api_startkit"}]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi (>=0.115.8,<0.116.0)",
+    "uvicorn[standard] (>=0.34.0,<0.35.0)",
+    "sqlalchemy (>=2.0.38,<3.0.0)",
+    "alembic (>=1.14.1,<2.0.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)",
+    "pydantic (>=2.10.6,<3.0.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)",
+    "httpx (>=0.28.1,<0.29.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.3"
+
