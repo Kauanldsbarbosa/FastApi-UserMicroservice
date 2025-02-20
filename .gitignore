@@ -1,0 +1,65 @@
+# 🔹 Python
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+.env
+.env.* 
+*.log
+instance/
+.vscode/
+.idea/
+
+# 🔹 Virtual Environments
+.venv/
+.env/
+venv/
+poetry.lock
+
+# 🔹 Docker
+docker-compose.override.yml
+docker-compose.override.yml.*
+*.dockerfile
+.dockerignore
+
+# 🔹 Logs & Cache
+logs/
+*.log
+*.out
+*.err
+*.pid
+cache/
+*.sqlite3
+
+# 🔹 Poetry & Pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 🔹 Database & Migrations
+db.sqlite3
+db_data/
+migrations/
+
+# 🔹 Jupyter Notebooks
+.ipynb_checkpoints/
+
+# 🔹 VSCode, JetBrains e outros editores
+.vscode/
+.idea/
+*.iml
+
+# 🔹 Pytest & Coverage
+.coverage
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+.cache/
+.tox/
+dist/
+build/
+
+# 🔹 Node.js (caso use frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
