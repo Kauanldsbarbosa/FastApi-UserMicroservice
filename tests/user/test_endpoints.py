@@ -4,7 +4,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.models.user import User
+from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
 
 

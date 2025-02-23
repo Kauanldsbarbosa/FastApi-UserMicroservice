@@ -1,5 +1,5 @@
 from app.models.base import Base
-from app.models.user import User
+from app.user.models import User
 from dotenv import load_dotenv
 import os
 

@@ -5,7 +5,7 @@ import pytest
 from fastapi import HTTPException, status
 from sqlalchemy.future import select
 
-from app.models.user import User
+from app.user.models import User
 from app.user.repository import UserRepository
 from app.user.schema import BaseUserSchema, UserCreate
 

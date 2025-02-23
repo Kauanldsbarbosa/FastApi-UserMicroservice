@@ -5,7 +5,7 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models.user import User
+from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
 
 
