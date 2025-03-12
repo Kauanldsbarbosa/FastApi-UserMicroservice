@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.system.database.connection import Session, engine, get_db
 from app.main import app
 from app.models.base import Base
+from app.system.database.connection import Session, engine, get_db
 from app.user.models import User
 
 os.environ['ENVIRONMENT'] = 'test'

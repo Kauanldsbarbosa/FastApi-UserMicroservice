@@ -29,6 +29,8 @@ dependencies = [
     "ruff (>=0.9.7,<0.10.0)",
     "pytest-cov (>=6.0.0,<7.0.0)",
     "pwdlib[argon2] (>=0.2.1,<0.3.0)",
+    "python-jose (>=3.4.0,<4.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
 ]
 
 
@@ -63,3 +65,6 @@ select = ['I', 'F', 'E', 'W', 'PL', 'PT']
 [tool.ruff.format]
 preview = true
 quote-style = 'single'
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"

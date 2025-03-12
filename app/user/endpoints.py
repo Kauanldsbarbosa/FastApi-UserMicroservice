@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.system.database.connection import get_db
@@ -71,3 +72,22 @@ async def delete_user(
         status_code=status.HTTP_204_NO_CONTENT,
         content='User deleted successfully.',
     )
+
+@router.post(
+        '/auth',
+        summary="User authentication",
+        description="""
+            In this context the email will be used as username
+            """,
+        )
+async def auth(
+    login_request_form: OAuth2PasswordRequestForm = Depends(),
+    db_session: AsyncSession = Depends(get_db)
+):
+    repository = UserRepository(db_session)
+    token_data = await repository.authenticate(
+        email=login_request_form.username,
+        password=login_request_form.password
+        )
+    
+    return token_data
