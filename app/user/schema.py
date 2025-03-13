@@ -57,3 +57,10 @@ class UserCreate(BaseUserSchema):
 
 class UserResponse(BaseUserSchema):
     uuid: UUID
+
+
+class AccessToken(BaseModel):
+    access_token: str
+    token_type: str = 'bearer'
+    expires_in: int
+    user: UserResponse
