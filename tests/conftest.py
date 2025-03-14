@@ -12,6 +12,7 @@ from app.main import app
 from app.models.base import Base
 from app.system.database.connection import Session, engine, get_db
 from app.user.models import User
+from app.system.security.security import get_password_hash
 
 os.environ['ENVIRONMENT'] = 'test'
 
@@ -58,7 +59,7 @@ async def create_user(db_session: AsyncSession):
         date_of_birth=date(1995, 5, 20),
         password='SecurePass!',
     )
-
+    user.password = get_password_hash(user.password)
     db_session.add(user)
     await db_session.commit()
     await db_session.refresh(user)

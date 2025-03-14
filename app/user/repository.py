@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 import os
 
@@ -11,13 +11,13 @@ from jose import jwt, JWTError
 
 
 from app.user.models import User
-from app.user.schema import AccessToken, BaseUserSchema, UserCreate
+from app.user.schema import AccessToken, BaseUserSchema, UserCreate, UserResponse
 from app.system.security.security import get_password_hash, verify_password
 from app.config.settings import get_config
 
 
 load_dotenv()
-token_expires_in = get_config().AUTH_TOKEN_EXPIRES
+token_expires_in = int(get_config().AUTH_TOKEN_EXPIRES)
 ALGORITHM = get_config().ALGORITHM
 SECRET_KEY = get_config().SECRET_KEY
 
@@ -69,19 +69,25 @@ class UserRepository:
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password.")
     
-        if not verify_password(password, user.password):
+        if not verify_password(password, str(user.password)):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password.")
 
-        expires_at = datetime.now(datetime.timezone.utc) + timedelta(minutes=token_expires_in)
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=token_expires_in)
 
         payload = {
-            'sub': user.__dict__,
-            'exp': expires_at.timestamp(),
+            'sub': f'{user.uuid}',
+            'exp': int(expires_at.timestamp()),
+            'user': {
+                'uuid': f'{user.uuid}',
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email
+            },
         }
 
         access_token = jwt.encode(payload, SECRET_KEY, ALGORITHM)
         return AccessToken(
-            access_token=access_token, 
+            token=access_token, 
             token_type='bearer', 
             expires_in=token_expires_in, 
             )
