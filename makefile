@@ -1,10 +1,13 @@
-PYTEST=docker-compose run --user 1000 apistartkit sh -c "pytest"
-EXPORT_REQ=poetry export -f requirements.txt --output contrib/requirements.txt
-
-.PHONY: test export
+.PHONY: test create-requirements makemigrations migrate
 
 test:
-	$(PYTEST)
+	docker-compose run --rm --user 1000 apistartkit sh -c "pytest"
 
 create-requirements:
-	$(EXPORT_REQ)
+	poetry export -f requirements.txt --without-hashes --output contrib/requirements.txt
+
+makemigrations:
+	docker-compose run --rm --user 1000 apistartkit sh -c "alembic revision --autogenerate -m 'migration'"
+
+migrate:
+	docker-compose run --rm --user 1000 apistartkit sh -c "alembic upgrade head"
