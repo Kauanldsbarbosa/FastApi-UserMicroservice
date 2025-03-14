@@ -1,17 +1,16 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
-import os
 
 from dotenv import load_dotenv
 from fastapi import status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from jose import jwt, JWTError
+from jose import jwt
 
 
 from app.user.models import User
-from app.user.schema import AccessToken, BaseUserSchema, UserCreate, UserResponse
+from app.user.schema import AccessToken, BaseUserSchema, UserCreate
 from app.system.security.security import get_password_hash, verify_password
 from app.config.settings import get_config
 

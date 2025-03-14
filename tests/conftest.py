@@ -13,7 +13,7 @@ from app.models.base import Base
 from app.system.database.connection import Session, engine, get_db
 from app.user.models import User
 from app.system.security.security import get_password_hash
-from app.user.utils import get_current_user
+from app.user.utils.decode_user_token import get_current_user
 
 os.environ['ENVIRONMENT'] = 'test'
 
