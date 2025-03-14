@@ -1,12 +1,19 @@
 from uuid import uuid4
 
+from dotenv import load_dotenv
 import pytest
 from fastapi import status
 from httpx import AsyncClient
+from jose import jwt
 
 from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
+from app.config.settings import get_config
 
+
+load_dotenv()
+ALGORITHM = get_config().ALGORITHM
+SECRET_KEY = get_config().SECRET_KEY
 
 @pytest.mark.asyncio
 async def test_create_user(client, setup_db):
@@ -87,3 +94,36 @@ async def test_delete_user_not_found(client: AsyncClient, setup_db):
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['detail'] == 'user not found.'
+
+@pytest.mark.asyncio
+async def test_auth(client: AsyncClient, create_user: User, setup_db):
+    response = await client.post(
+        '/user/auth', 
+        data={
+            'username': create_user.email,
+            'password': 'SecurePass!'
+        }
+              )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['token'] is not None
+    assert response.json()['token_type'] == 'bearer'
+    
+    token = jwt.decode(response.json()['token'], SECRET_KEY, algorithms=[ALGORITHM])
+    assert token['sub'] == str(create_user.uuid)
+    assert token['exp'] is not None
+    assert token['user']['first_name'] == create_user.first_name
+    assert token['user']['last_name'] == create_user.last_name
+    assert token['user']['email'] == create_user.email
+
+@pytest.mark.asyncio
+async def test_auth_invalid_password(client: AsyncClient, create_user: User, setup_db):
+    response = await client.post(
+        '/user/auth', 
+        data={
+            'username': create_user.email,
+            'password': 'InvalidPass!'
+        }
+              )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()['detail'] == 'Incorrect username or password.'
+    
