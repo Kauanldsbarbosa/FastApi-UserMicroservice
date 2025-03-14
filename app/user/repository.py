@@ -9,8 +9,8 @@ from sqlalchemy.future import select
 from jose import jwt
 
 
-from app.user.models import User
-from app.user.schema import AccessToken, BaseUserSchema, UserCreate
+from app.user.models import User, ResetPasswordToken
+from app.user.schema import AccessToken, BaseUserSchema, UserCreate, RequestPasswordResetSchema
 from app.system.security.security import get_password_hash, verify_password
 from app.config.settings import get_config
 
@@ -90,3 +90,19 @@ class UserRepository:
             token_type='bearer', 
             expires_in=token_expires_in, 
             )
+
+    async def generate_reset_password_token(self, email:str):
+        result = await self.db_session.execute(
+            select(User).filter_by(email=email)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            return
+        token = ResetPasswordToken(user_id=user.uuid)
+        self.db_session.add(token)
+        await self.db_session.flush()
+        await self.db_session.commit()
+        await self.db_session.refresh(token)
+        
+        return token
+    

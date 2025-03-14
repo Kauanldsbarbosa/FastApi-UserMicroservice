@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.future import select
 from jose import jwt
 
-from app.user.models import User
+from app.user.models import User, ResetPasswordToken
 from app.user.repository import UserRepository
 from app.user.schema import AccessToken, BaseUserSchema, UserCreate
 
@@ -30,11 +30,11 @@ async def test_create_user(db_session):
     result = await db_session.execute(
         select(User).filter_by(email=user_data.email)
     )
-    product_on_db = result.scalars().first()
+    user_on_db = result.scalars().first()
 
-    assert product_on_db is not None
-    assert product_on_db.email == user_data.email
-    assert product_on_db.first_name == user_data.first_name
+    assert user_on_db is not None
+    assert user_on_db.email == user_data.email
+    assert user_on_db.first_name == user_data.first_name
 
     try:
         await db_session.delete(user)
@@ -118,3 +118,20 @@ async def test_authenticate_with_invalid_credentials(db_session):
         )
         assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
 
+@pytest.mark.asyncio
+async def test_generate_reset_password_token(db_session, create_user: User):
+    repository = UserRepository(db_session)
+    result = await repository.generate_reset_password_token(create_user.email)
+
+    result = await db_session.execute(
+        select(ResetPasswordToken).filter_by(user_id=create_user.uuid)
+    )
+    token_on_db = result.scalars().first()
+
+    assert token_on_db is not None
+    assert token_on_db.user_id == create_user.uuid
+    assert token_on_db.token is not None
+    assert token_on_db.expires_at is not None
+
+    await db_session.delete(create_user)
+    await db_session.commit()

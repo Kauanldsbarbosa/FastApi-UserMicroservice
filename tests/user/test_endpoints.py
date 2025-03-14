@@ -5,6 +5,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 from jose import jwt
+from sqlalchemy import select
 
 from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
@@ -16,7 +17,7 @@ ALGORITHM = get_config().ALGORITHM
 SECRET_KEY = get_config().SECRET_KEY
 
 @pytest.mark.asyncio
-async def test_create_user(client, setup_db):
+async def test_create_user(client, setup_db, db_session):
     user_data = UserCreate(
         email='testuser@example.com',
         first_name='Jane',
@@ -35,6 +36,13 @@ async def test_create_user(client, setup_db):
     assert response.json()['email'] == user_data.email
     assert response.json()['first_name'] == user_data.first_name
     assert response.json()['last_name'] == user_data.last_name
+
+    user_in_db = await db_session.execute(select(User).filter_by(uuid=response.json()['uuid']))
+    user_obj = user_in_db.scalars().first()
+
+    if user_obj:
+        await db_session.delete(user_obj)
+        await db_session.commit()
 
 
 @pytest.mark.asyncio
