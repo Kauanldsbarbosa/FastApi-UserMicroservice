@@ -101,32 +101,22 @@ def test_valid_user_response():
     assert user_response.date_of_birth == date(1995, 5, 20)
 
 def test_valid_token_response():
-    user_response = UserResponse(
-        uuid=UUID('123e4567-e89b-12d3-a456-426614174000'),
-        email='validuser@example.com',
-        social_name=None,
-        first_name='John',
-        last_name='Doe',
-        date_of_birth=date(1995, 5, 20),
-    )
+    random_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzd' \
+    'WIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3'
     token_response = AccessToken(
-        access_token=
-        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3',
+        token=random_token,
         token_type='bearer',
         expires_in=15,
-        user=user_response
         )
 
-    assert token_response.access_token == 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3'
+    assert token_response.token == random_token
     assert token_response.token_type == 'bearer'
     assert token_response.expires_in == 15
-    assert token_response.user == user_response
 
 def test_invalid_token_response():
     with pytest.raises(ValidationError):
         AccessToken(
-            access_token='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3',
+            token=None,
             token_type='bearer',
             expires_in=15,
-            user={} # Invalid user
         )

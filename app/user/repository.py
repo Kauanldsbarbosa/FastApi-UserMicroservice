@@ -11,7 +11,7 @@ from jose import jwt, JWTError
 
 
 from app.user.models import User
-from app.user.schema import BaseUserSchema, UserCreate
+from app.user.schema import AccessToken, BaseUserSchema, UserCreate
 from app.system.security.security import get_password_hash, verify_password
 from app.config.settings import get_config
 
@@ -75,9 +75,13 @@ class UserRepository:
         expires_at = datetime.now(datetime.timezone.utc) + timedelta(minutes=token_expires_in)
 
         payload = {
-            'sub': f'{user.first_name} {user.last_name}',
-            'exp': expires_at
+            'sub': user.__dict__,
+            'exp': expires_at.timestamp(),
         }
 
-        acess_token = jwt.encode(payload, SECRET_KEY, ALGORITHM)
-        return acess_token
+        access_token = jwt.encode(payload, SECRET_KEY, ALGORITHM)
+        return AccessToken(
+            access_token=access_token, 
+            token_type='bearer', 
+            expires_in=token_expires_in, 
+            )
