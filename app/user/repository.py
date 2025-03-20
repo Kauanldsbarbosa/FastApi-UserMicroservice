@@ -41,6 +41,17 @@ class UserRepository:
             )
         return user
 
+    async def get_user_by_email(self, email: str) -> User:
+        result = await self.db_session.execute(
+            select(User).filter_by(email=email)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail='user not found.'
+            )
+        return user
+
     async def update_user(
         self, user_id: UUID, user_data: BaseUserSchema
     ) -> User:

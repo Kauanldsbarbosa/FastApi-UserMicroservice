@@ -88,3 +88,16 @@ async def test_delete_user(db_session, create_user):
     with pytest.raises(HTTPException) as exc_info:
         await repository.get_user_by_id(user.uuid)
     assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_email(db_session, create_user):
+    user = create_user
+    repository = UserRepository(db_session)
+
+    fetched_user = await repository.get_user_by_email(user.email)
+
+    assert fetched_user is not None
+    assert fetched_user.email == user.email
+    assert fetched_user.first_name == user.first_name
+    assert fetched_user.last_name == user.last_name
