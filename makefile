@@ -11,3 +11,6 @@ makemigrations:
 
 migrate:
 	docker-compose run --rm --user 1000 apistartkit sh -c "alembic upgrade head"
+
+up:
+	docker compose -f 'docker-compose.yml' up -d --build
