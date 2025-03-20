@@ -9,7 +9,7 @@ from sqlalchemy.future import select
 from app.auth.schemas import AccessToken
 from app.config.settings import get_config
 from app.system.security.security import verify_password
-from app.user.models import User
+from app.user.models import ResetPasswordToken, User
 
 load_dotenv()
 token_expires_in = int(get_config().AUTH_TOKEN_EXPIRES)
@@ -60,3 +60,25 @@ class AuthRepository:
             token_type='bearer',
             expires_in=token_expires_in,
         )
+
+    async def request_password_recovery_token(
+        self, email: str
+    ) -> ResetPasswordToken:
+        user_result = await self.db_session.execute(
+            select(User).filter(User.email == email)
+        )
+        user = user_result.scalar_one_or_none()
+        if not user:
+            return None
+
+        token = await self.create_token(user)
+        # TODO: send email with token
+        return token
+
+    async def create_token(self, user: User) -> ResetPasswordToken:
+        token = ResetPasswordToken(user_id=user.uuid)
+        self.db_session.add(token)
+        await self.db_session.flush()
+        await self.db_session.commit()
+        await self.db_session.refresh(token)
+        return token

@@ -39,3 +39,15 @@ async def test_authenticate_with_invalid_credentials(db_session):
         await repository.authenticate(email='invalid', password='invalid!')
 
     assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
+async def test_request_password_recovery_token(db_session, create_user: User):
+    user = create_user
+    repository = AuthRepository(db_session)
+    result = await repository.request_password_recovery_token(email=user.email)
+    assert result is not None
+    assert result.user_id == user.uuid
+    assert result.expires_at is not None
+    assert result.token is not None
+    assert isinstance(result.token, str)
