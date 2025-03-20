@@ -8,8 +8,9 @@ from sqlalchemy.future import select
 
 from app.auth.schemas import AccessToken
 from app.config.settings import get_config
-from app.system.security.security import verify_password
+from app.system.security.security import verify_password, get_password_hash
 from app.user.models import ResetPasswordToken, User
+from app.user.repository import UserRepository
 
 load_dotenv()
 token_expires_in = int(get_config().AUTH_TOKEN_EXPIRES)
@@ -74,7 +75,29 @@ class AuthRepository:
         token = await self.create_token(user)
         # TODO: send email with token
         return token
-
+    
+    async def change_user_password(self, token: str, new_password:str):
+        token_on_db = await self.find_token(token)
+        if not token_on_db:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This token is not valid."
+                )
+        if token_on_db.expires_at < datetime.now(timezone.utc):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="The token is expired"
+            )
+        
+        update_user:User = await UserRepository(self.db_session).get_user_by_id(
+            user_id=token_on_db.user_id
+            )
+        update_user.password = get_password_hash(new_password)
+        
+        self.db_session.add(update_user)
+        await self.db_session.delete(token_on_db)
+        await self.db_session.commit()
+        
     async def create_token(self, user: User) -> str:
         token = ResetPasswordToken(user_id=user.uuid)
         self.db_session.add(token)
@@ -82,3 +105,12 @@ class AuthRepository:
         await self.db_session.commit()
         await self.db_session.refresh(token)
         return token.token
+
+    async def find_token(self, token:str):
+        result = await self.db_session.execute(
+            select(ResetPasswordToken).filter(
+                ResetPasswordToken.token == token
+            )
+        )
+        token_on_db = result.scalar_one_or_none()
+        return token_on_db
