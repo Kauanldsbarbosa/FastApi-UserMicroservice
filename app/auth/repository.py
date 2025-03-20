@@ -97,6 +97,7 @@ class AuthRepository:
         self.db_session.add(update_user)
         await self.db_session.delete(token_on_db)
         await self.db_session.commit()
+        await self.db_session.refresh(update_user)
         
     async def create_token(self, user: User) -> str:
         token = ResetPasswordToken(user_id=user.uuid)

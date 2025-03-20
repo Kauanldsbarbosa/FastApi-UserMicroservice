@@ -50,8 +50,15 @@ async def test_request_password_recovery_token(db_session, create_user: User):
     repository = AuthRepository(db_session)
     result = await repository.request_password_recovery_token(email=user.email)
     assert result is not None
-    assert result is not None
     assert isinstance(result, str)
+    token_result = await db_session.execute(
+        select(ResetPasswordToken).filter(ResetPasswordToken.token == result)
+    )
+    token = token_result.scalar_one_or_none()
+    assert token is not None
+    assert token.user_id == user.uuid
+    await db_session.delete(token)
+    await db_session.commit()
 
 @pytest.mark.asyncio
 async def test_change_user_password(db_session:AsyncSession, create_user: User):

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.repository import AuthRepository
-from app.auth.schemas import AccessToken, RequestPasswordResetSchema
+from app.auth.schemas import AccessToken, RequestPasswordResetSchema, ResetPasswordSchema
 from app.system.database.connection import get_db
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
@@ -45,3 +45,24 @@ async def request_password_recovery_token(
     return {
         'token': result
     }
+
+@router.post(
+    '/change-password',
+    summary='change user password',
+    description="""
+            This endpoint is used to change user password.
+            """,
+)
+async def change_password(
+    token_and_new_pass: ResetPasswordSchema, 
+    db_session: AsyncSession = Depends(get_db)
+):
+    repository = AuthRepository(db_session)
+    await repository.change_user_password(
+        new_password=token_and_new_pass.new_password,
+        token=token_and_new_pass.token
+        )
+    return {
+        'message ': 'password changed successfully'
+    }
+
