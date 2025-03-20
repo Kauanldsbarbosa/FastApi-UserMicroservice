@@ -9,7 +9,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.main import app
-from app.models.base import Base
+from app.system.database.base import Base
 from app.system.database.connection import Session, engine, get_db
 from app.user.models import User
 from app.system.security.security import get_password_hash

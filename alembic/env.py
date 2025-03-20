@@ -1,5 +1,6 @@
-from app.models.base import Base
+from app.system.database.base import Base
 from app.user.models import *
+from app.auth.models import *
 from dotenv import load_dotenv
 import os
 

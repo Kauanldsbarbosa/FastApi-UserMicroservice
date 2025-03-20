@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.system.database.connection import get_db
 from app.user.repository import UserRepository
-from app.user.schema import AccessToken, BaseUserSchema, UserCreate, UserResponse
+from app.user.schema import BaseUserSchema, UserCreate, UserResponse
 from app.user.utils.decode_user_token import get_current_user
 
 router = APIRouter(prefix='/user', tags=['Users'])
@@ -81,22 +81,4 @@ async def delete_user(
         content='User deleted successfully.',
     )
 
-@router.post(
-        '/auth',
-        summary="User authentication",
-        description="""
-            In this context the email will be used as username
-            """,
-        response_model=AccessToken
-        )
-async def auth(
-    login_request_form: OAuth2PasswordRequestForm = Depends(),
-    db_session: AsyncSession = Depends(get_db),
-):
-    repository = UserRepository(db_session)
-    token_data = await repository.authenticate(
-        email=login_request_form.username,
-        password=login_request_form.password
-        )
-    
-    return token_data
+

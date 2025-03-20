@@ -27,6 +27,6 @@ class ResetPasswordToken(Base):
 
     token = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.uuid', ondelete="CASCADE"), nullable=False)
-    expires_at = Column(DateTime, nullable=False, default=lambda: expires_date(token_expires_in=10))
+    expires_at = Column(DateTime(timezone=True), nullable=False, default=lambda: expires_date(token_expires_in=10))
 
     user = relationship("User", back_populates="reset_tokens")

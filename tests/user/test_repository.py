@@ -6,9 +6,9 @@ from fastapi import HTTPException, status
 from sqlalchemy.future import select
 from jose import jwt
 
-from app.user.models import User, ResetPasswordToken
+from app.user.models import User
 from app.user.repository import UserRepository
-from app.user.schema import AccessToken, BaseUserSchema, UserCreate
+from app.user.schema import BaseUserSchema, UserCreate
 
 ALGORITHM = "HS256"
 SECRET_KEY='3471f8db81f2c685a7edd5dbea62b6fb77987a548abe9ea42332998deb41b706'
@@ -89,49 +89,3 @@ async def test_delete_user(db_session, create_user):
     with pytest.raises(HTTPException) as exc_info:
         await repository.get_user_by_id(user.uuid)
     assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-
-
-@pytest.mark.asyncio
-async def test_authenticate(db_session, create_user: User):
-    user = create_user
-    repository = UserRepository(db_session)
-    result = await repository.authenticate(
-        email=user.email,
-        password='SecurePass!'
-    )
-    token:dict = jwt.decode(result.token, SECRET_KEY, algorithms=[ALGORITHM])
-    assert result is not None
-    assert type(result) == AccessToken
-    assert ['sub', 'exp', 'user'] == list(token.keys())
-    assert token['user']['uuid'] == str(user.uuid)
-    assert token['user']['first_name'] == user.first_name
-    assert token['user']['last_name'] == user.last_name
-    assert token['user']['email'] == user.email
-
-@pytest.mark.asyncio
-async def test_authenticate_with_invalid_credentials(db_session):
-    with pytest.raises(HTTPException) as exc_info:
-        repository = UserRepository(db_session)
-        result = await repository.authenticate(
-            email='invalid',
-            password='invalid!'
-        )
-        assert exc_info.value.status_code == status.HTTP_401_UNAUTHORIZED
-
-@pytest.mark.asyncio
-async def test_generate_reset_password_token(db_session, create_user: User):
-    repository = UserRepository(db_session)
-    result = await repository.generate_reset_password_token(create_user.email)
-
-    result = await db_session.execute(
-        select(ResetPasswordToken).filter_by(user_id=create_user.uuid)
-    )
-    token_on_db = result.scalars().first()
-
-    assert token_on_db is not None
-    assert token_on_db.user_id == create_user.uuid
-    assert token_on_db.token is not None
-    assert token_on_db.expires_at is not None
-
-    await db_session.delete(create_user)
-    await db_session.commit()
