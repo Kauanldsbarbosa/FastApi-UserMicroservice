@@ -24,4 +24,3 @@ class RequestPasswordResetSchema(BaseModel):
     @field_validator('email')
     def validate_email(cls, value):
         return validate_email(value)
-    

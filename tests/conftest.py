@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.main import app
 from app.system.database.base import Base
 from app.system.database.connection import Session, engine, get_db
-from app.user.models import User
 from app.system.security.security import get_password_hash
+from app.user.models import User
 from app.user.utils.decode_user_token import get_current_user
 
 os.environ['ENVIRONMENT'] = 'test'
@@ -44,9 +44,12 @@ async def db_session():
 
 
 def override_get_current_user():
-    return {"user_id": "test_user"}
+    return {'user_id': 'test_user'}
+
 
 app.dependency_overrides[get_current_user] = override_get_current_user
+
+
 @pytest_asyncio.fixture
 async def client():
     async with AsyncClient(

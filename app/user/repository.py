@@ -6,11 +6,10 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.config.settings import get_config
+from app.system.security.security import get_password_hash
 from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
-from app.system.security.security import get_password_hash
-from app.config.settings import get_config
-
 
 load_dotenv()
 token_expires_in = int(get_config().AUTH_TOKEN_EXPIRES)

@@ -1,20 +1,19 @@
 from uuid import uuid4
 
-from dotenv import load_dotenv
 import pytest
+from dotenv import load_dotenv
 from fastapi import status
 from httpx import AsyncClient
-from jose import jwt
 from sqlalchemy import select
 
+from app.config.settings import get_config
 from app.user.models import User
 from app.user.schema import BaseUserSchema, UserCreate
-from app.config.settings import get_config
-
 
 load_dotenv()
 ALGORITHM = get_config().ALGORITHM
 SECRET_KEY = get_config().SECRET_KEY
+
 
 @pytest.mark.asyncio
 async def test_create_user(client, setup_db, db_session):
@@ -37,7 +36,9 @@ async def test_create_user(client, setup_db, db_session):
     assert response.json()['first_name'] == user_data.first_name
     assert response.json()['last_name'] == user_data.last_name
 
-    user_in_db = await db_session.execute(select(User).filter_by(uuid=response.json()['uuid']))
+    user_in_db = await db_session.execute(
+        select(User).filter_by(uuid=response.json()['uuid'])
+    )
     user_obj = user_in_db.scalars().first()
 
     if user_obj:

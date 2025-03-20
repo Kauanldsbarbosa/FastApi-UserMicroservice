@@ -10,7 +10,4 @@ class DevelopmentConfig(BaseConfig):
             'DATABASE_URL',
             'postgresql://apistartkit_user:supersecurepassword@db:5432/apistartkit_db',
         )
-        self.AUTH_TOKEN_EXPIRES = os.getenv(
-            'AUTH_TOKEN_EXPIRES',
-            '30'
-            )
+        self.AUTH_TOKEN_EXPIRES = os.getenv('AUTH_TOKEN_EXPIRES', '30')

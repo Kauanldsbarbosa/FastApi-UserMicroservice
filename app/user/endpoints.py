@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Response, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.system.database.connection import get_db
@@ -37,10 +36,10 @@ async def create_user(
     summary='Retrieve a user by their ID.',
 )
 async def get_user(
-    user_id: UUID, 
-    db_session: AsyncSession = Depends(get_db), 
-    user_uuid_token: dict = Depends(get_current_user)
-    ):	
+    user_id: UUID,
+    db_session: AsyncSession = Depends(get_db),
+    user_uuid_token: dict = Depends(get_current_user),
+):
     repository = UserRepository(db_session=db_session)
     user = await repository.get_user_by_id(user_id=user_id)
     return UserResponse.model_validate(user)
@@ -58,7 +57,7 @@ async def update_user(
     user_id: UUID,
     user_data: BaseUserSchema,
     db_session: AsyncSession = Depends(get_db),
-    user_uuid_token: dict = Depends(get_current_user)
+    user_uuid_token: dict = Depends(get_current_user),
 ):
     repository = UserRepository(db_session=db_session)
     user = await repository.update_user(user_id=user_id, user_data=user_data)
@@ -71,14 +70,12 @@ async def update_user(
     summary='Delete a user by their ID.',
 )
 async def delete_user(
-    user_id: UUID, 
+    user_id: UUID,
     db_session: AsyncSession = Depends(get_db),
-    user_uuid_token: dict = Depends(get_current_user)
+    user_uuid_token: dict = Depends(get_current_user),
 ):
     await UserRepository(db_session=db_session).delete_user(user_id=user_id)
     return Response(
         status_code=status.HTTP_204_NO_CONTENT,
         content='User deleted successfully.',
     )
-
-

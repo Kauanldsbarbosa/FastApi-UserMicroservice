@@ -9,11 +9,12 @@ def validate_email(email: str):
 
     return email
 
+
 def validate_password(password: str):
     MIN_PASSWORD_LENGTH = 6
 
     if len(password) < MIN_PASSWORD_LENGTH:
-            raise ValueError('Password must be at least 6 characters long')
+        raise ValueError('Password must be at least 6 characters long')
     if not re.search(r'[!@#$%^&*(),.?\":{}|<>]', password):
         raise ValueError(
             'Password must contain at least one special character'

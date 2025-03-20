@@ -1,28 +1,39 @@
-from pydantic import ValidationError
 import pytest
-from app.auth.schemas import AccessToken, RequestPasswordResetSchema, ResetPasswordSchema
+from pydantic import ValidationError
+
+from app.auth.schemas import (
+    AccessToken,
+    RequestPasswordResetSchema,
+    ResetPasswordSchema,
+)
 
 
 def test_valid_token_response():
-    random_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzd' \
-    'WIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3'
+    random_token = (
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzd'
+        'WIiOiJKb2huIERvZSIsImV4cCI6MTYyNzQ2MjIyMH0.5z1b3'
+    )
+    token_time_expire = 15
     token_response = AccessToken(
         token=random_token,
         token_type='bearer',
-        expires_in=15,
-        )
+        expires_in=token_time_expire,
+    )
 
     assert token_response.token == random_token
     assert token_response.token_type == 'bearer'
-    assert token_response.expires_in == 15
+    assert token_response.expires_in == token_time_expire
+
 
 def test_invalid_token_response():
+    token_time_expire = 15
     with pytest.raises(ValidationError):
         AccessToken(
             token=None,
             token_type='bearer',
-            expires_in=15,
+            expires_in=token_time_expire,
         )
+
 
 def test_reset_password_schema():
     fake_token = '1a2b3c'
@@ -32,6 +43,7 @@ def test_reset_password_schema():
     )
     assert schema.new_password == 'SecurePass!'
     assert schema.token == fake_token
+
 
 def test_invalid_reset_password_schema():
     with pytest.raises(ValidationError):
@@ -52,15 +64,12 @@ def test_invalid_reset_password_schema():
             token='1a2b3c',
         )
 
+
 def test_request_password_reset_schema():
-    schema = RequestPasswordResetSchema(
-        email='test@email.com'
-    )
+    schema = RequestPasswordResetSchema(email='test@email.com')
     assert schema.email == 'test@email.com'
+
 
 def test_invalid_request_password_reset_schema():
     with pytest.raises(ValidationError):
-        RequestPasswordResetSchema(
-            email=None
-        )
-        
+        RequestPasswordResetSchema(email=None)

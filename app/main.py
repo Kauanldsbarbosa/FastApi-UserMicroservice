@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from app.user.endpoints import router as UserRouter
 from app.auth.endpoints import router as AuthRouter
+from app.user.endpoints import router as UserRouter
 
 app = FastAPI()
 app.include_router(UserRouter)

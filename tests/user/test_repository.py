@@ -4,14 +4,13 @@ from uuid import uuid4
 import pytest
 from fastapi import HTTPException, status
 from sqlalchemy.future import select
-from jose import jwt
 
 from app.user.models import User
 from app.user.repository import UserRepository
 from app.user.schema import BaseUserSchema, UserCreate
 
-ALGORITHM = "HS256"
-SECRET_KEY='3471f8db81f2c685a7edd5dbea62b6fb77987a548abe9ea42332998deb41b706'
+ALGORITHM = 'HS256'
+SECRET_KEY = '3471f8db81f2c685a7edd5dbea62b6fb77987a548abe9ea42332998deb41b706'
 
 
 @pytest.mark.asyncio

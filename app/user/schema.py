@@ -44,9 +44,6 @@ class UserCreate(BaseUserSchema):
     def validate_password(cls, value):
         return validate_password(value)
 
+
 class UserResponse(BaseUserSchema):
     uuid: UUID
-
-
-
-    

@@ -1,11 +1,9 @@
 from datetime import date
 from uuid import UUID
 
-from pydantic import ValidationError
 import pytest
 
-from app.user.schema import UserCreate, UserResponse 
-from app.auth.schemas import ResetPasswordSchema, RequestPasswordResetSchema, AccessToken
+from app.user.schema import UserCreate, UserResponse
 
 
 def test_invalid_email():
@@ -100,4 +98,3 @@ def test_valid_user_response():
     assert user_response.first_name == 'John'
     assert user_response.last_name == 'Doe'
     assert user_response.date_of_birth == date(1995, 5, 20)
-        
