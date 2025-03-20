@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.repository import AuthRepository
-from app.auth.schemas import AccessToken
+from app.auth.schemas import AccessToken, RequestPasswordResetSchema
 from app.system.database.connection import get_db
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
@@ -27,3 +27,21 @@ async def auth(
     )
 
     return token_data
+
+
+@router.post(
+    '/password-reset',
+    summary='Request password recovery token',
+    description="""
+            This endpoint is used to request a password recovery token.
+            """,
+)
+async def request_password_recovery_token(
+    email: RequestPasswordResetSchema, 
+    db_session: AsyncSession = Depends(get_db)
+):
+    repository = AuthRepository(db_session)
+    result = await repository.request_password_recovery_token(email=email.email)
+    return {
+        'token': result
+    }

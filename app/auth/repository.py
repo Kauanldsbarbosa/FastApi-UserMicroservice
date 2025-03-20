@@ -63,7 +63,7 @@ class AuthRepository:
 
     async def request_password_recovery_token(
         self, email: str
-    ) -> ResetPasswordToken:
+    ):
         user_result = await self.db_session.execute(
             select(User).filter(User.email == email)
         )
@@ -75,10 +75,10 @@ class AuthRepository:
         # TODO: send email with token
         return token
 
-    async def create_token(self, user: User) -> ResetPasswordToken:
+    async def create_token(self, user: User) -> str:
         token = ResetPasswordToken(user_id=user.uuid)
         self.db_session.add(token)
         await self.db_session.flush()
         await self.db_session.commit()
         await self.db_session.refresh(token)
-        return token
+        return token.token

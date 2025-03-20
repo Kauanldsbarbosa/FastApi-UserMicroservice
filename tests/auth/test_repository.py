@@ -47,7 +47,5 @@ async def test_request_password_recovery_token(db_session, create_user: User):
     repository = AuthRepository(db_session)
     result = await repository.request_password_recovery_token(email=user.email)
     assert result is not None
-    assert result.user_id == user.uuid
-    assert result.expires_at is not None
-    assert result.token is not None
-    assert isinstance(result.token, str)
+    assert result is not None
+    assert isinstance(result, str)

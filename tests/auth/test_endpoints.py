@@ -43,3 +43,16 @@ async def test_auth_invalid_password(
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json()['detail'] == 'Incorrect username or password.'
+
+
+@pytest.mark.asyncio
+async def test_request_password_recovery_token(
+    client: AsyncClient, create_user: User, setup_db
+):
+    response = await client.post(
+    '/auth/password-reset',
+    json={'email': create_user.email},
+)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()['token'] is not None
+    assert isinstance(response.json()['token'], str)
